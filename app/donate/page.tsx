@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut, RedirectToSignIn, useUser } from "@clerk/nextjs";
+
 import {
   Heart,
   GraduationCap,
@@ -116,14 +117,33 @@ export default function StartFundmePage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFormData((prev) => ({ ...prev, image: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+    if (file && user?.id) {
+      try {
+        // Create FormData for the API request
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', file);
+        formDataUpload.append('userId', user.id);
+
+        // Upload via API route
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formDataUpload,
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          // Store the URL in form data
+          setFormData((prev) => ({ ...prev, image: result.url }));
+        } else {
+          const errorData = await response.json();
+          alert(`Upload failed: ${errorData.error}`);
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Failed to upload image. Please try again.');
+      }
     }
   };
 
@@ -140,6 +160,9 @@ export default function StartFundmePage() {
         body: JSON.stringify({
           ...formData,
           creator: user?.id,
+          userEmail: user?.primaryEmailAddress?.emailAddress,
+          firstName: user?.firstName,
+          lastName: user?.lastName,
         }),
       });
 
@@ -147,7 +170,8 @@ export default function StartFundmePage() {
         alert("Fundraiser created successfully!");
         router.push("/my-fundraisers");
       } else {
-        alert("Failed to create fundraiser");
+        const errorData = await response.json();
+        alert(`Failed to create fundraiser: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error:", error);

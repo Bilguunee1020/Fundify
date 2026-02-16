@@ -15,7 +15,16 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const skip = parseInt(searchParams.get('skip') || '0');
 
-    let query: any = { status: 'active' }; // Only show active fundraisers
+    let query: any = {};
+
+    // If creator is specified, show all their fundraisers (for my-fundraisers page)
+    // Otherwise, only show active fundraisers (for public listing)
+    if (creator) {
+      query.creator = creator;
+    } else {
+      query.status = 'active'; // Only show active fundraisers on public pages
+    }
+
     if (category && category !== 'all') {
       query.category = category;
     }
@@ -24,9 +33,6 @@ export async function GET(request: Request) {
         { title: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } }
       ];
-    }
-    if (creator) {
-      query.creator = creator;
     }
 
     const fundraisers = await Fundraiser.find(query)
@@ -48,17 +54,24 @@ export async function POST(request: Request) {
     await connectToDatabase();
 
     const body = await request.json();
-    const { title, description, goal, category, image, forWhom, creator, userEmail } = body;
+    const { title, description, goal, category, image, forWhom, creator, userEmail, firstName, lastName } = body;
 
     // Validate required fields
     if (!title || !description || !goal || !category || !forWhom || !creator || !userEmail) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Get user details
-    const user = await User.findOne({ clerkId: creator });
+    // Get or create user details
+    let user = await User.findOne({ clerkId: creator });
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      // User doesn't exist, create them
+      user = new User({
+        clerkId: creator,
+        email: userEmail,
+        firstName: firstName || 'Unknown',
+        lastName: lastName || 'User',
+      });
+      await user.save();
     }
 
     // Create new fundraiser with pending status
