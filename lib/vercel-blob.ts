@@ -1,1 +1,50 @@
-[{"@vercel/blob": "export interface UploadResult {\n  url: string;\n  downloadUrl: string;\n  size: number;\n  uploadedAt: Date;\n  pathname: string;\n  contentType: string;"}, {"access": "public"}, {"url": "blob.url", "downloadUrl": "blob.downloadUrl", "size": "blob.size", "uploadedAt": "blob.uploadedAt", "pathname": "blob.pathname", "contentType": "blob.contentType"}, {"Blob": ", error);\n    throw new Error('Failed to upload image to Vercel Blob", "uploadBase64Image(base64String": "string", "filename": "string): Promise<UploadResult> {\n  try {\n    // Remove the data URL prefix if present\n    const base64Data = base64String.replace(/^data:image/w+;base64", "type": "image/jpeg"}, ["blob], filename, { type: 'image/jpeg' });\n\n    return await uploadImage(file, filename);\n  } catch (error) {\n    console.error('Error uploading base64 image to Vercel Blob:', error);\n    throw new Error('Failed to upload base64 image to Vercel Blob');\n  }\n}\n\n/**\n * Delete an image from Vercel Blob storage\n * @param url - The URL of the image to delete\n */\nexport async function deleteImage(url: string): Promise<void> {\n  try {\n    // Note: Vercel Blob doesn't have a direct delete API in the client SDK\n    // You would need to use the Vercel Blob API or implement server-side deletion\n    // For now, this is a placeholder for future implementation\n    console.log('Delete image:', url);\n    // TODO: Implement deletion using Vercel Blob API\n  } catch (error) {\n    console.error('Error deleting image from Vercel Blob:', error);\n    throw new Error('Failed to delete image from Vercel Blob');\n  }\n}\n\n/**\n * Validate an image file before upload\n * @param file - The file to validate\n * @returns Validation result with isValid flag and optional error message\n */\nexport function validateImageFile(file: File): { isValid: boolean; error?: string } {\n  // Check file type\n  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];\n  if (!allowedTypes.includes(file.type)) {\n    return {\n      isValid: false,\n      error: 'Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.',\n    };\n  }\n\n  // Check file size (max 5MB)\n  const maxSize = 5 * 1024 * 1024; // 5MB in bytes\n  if (file.size > maxSize) {\n    return {\n      isValid: false,\n      error: 'File size exceeds 5MB limit.',\n    };\n  }\n\n  return { isValid: true };\n}\n\n/**\n * Generate a unique filename for an image upload\n * @param originalFilename - The original filename\n * @param userId - The user ID for organization\n * @returns A unique filename\n */\nexport function generateUniqueFilename(originalFilename: string, userId: string): string {\n  const timestamp = Date.now();\n  const randomString = Math.random().toString(36).substring(2, 15);\n  const extension = originalFilename.split('.').pop() || 'jpg';\n  return `${userId}/${timestamp}-${randomString}.${extension}`;\n}"]]
+// This file re-exports upload utilities from lib/utils/upload for backward compatibility
+// The actual @vercel/blob import is only used in server-side API routes
+
+export {
+  uploadImage,
+  deleteImage,
+  validateImageFile,
+  type UploadResult,
+  type UploadOptions,
+} from "./utils/upload";
+
+/**
+ * Generate a unique filename for an image upload
+ * @param originalFilename - The original filename
+ * @param userId - The user ID for organization
+ * @returns A unique filename
+ */
+export function generateUniqueFilename(
+  originalFilename: string,
+  userId: string,
+): string {
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 15);
+  const extension = originalFilename.split(".").pop() || "jpg";
+  return `${userId}/${timestamp}-${randomString}.${extension}`;
+}
+
+/**
+ * Upload a base64 image to Vercel Blob storage
+ * @param base64String - The base64 encoded image string
+ * @param filename - The filename for the uploaded image
+ * @returns Upload result with URL and metadata
+ */
+export async function uploadBase64Image(
+  base64String: string,
+  filename: string,
+): Promise<import("./utils/upload").UploadResult> {
+  try {
+    // Remove the data URL prefix if present
+    const base64Data = base64String.replace(/^data:image\/[a-z]+;base64,/, "");
+    const buffer = Buffer.from(base64Data, "base64");
+    const file = new File([buffer], filename, { type: "image/jpeg" });
+
+    const { uploadImage } = await import("./utils/upload");
+    return await uploadImage(file, filename);
+  } catch (error) {
+    console.error("Error uploading base64 image to Vercel Blob:", error);
+    throw new Error("Failed to upload base64 image to Vercel Blob");
+  }
+}

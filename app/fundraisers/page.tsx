@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Search, Heart, TrendingUp } from "lucide-react";
@@ -21,19 +22,39 @@ interface Fundraiser {
 
 export default function FundraisersPage() {
   const router = useRouter();
+  const { user } = useUser();
   const [fundraisers, setFundraisers] = useState<Fundraiser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchFundraisers();
-  }, []);
+  }, [user]);
 
   const fetchFundraisers = async () => {
     try {
-      const response = await fetch("/api/fundraisers");
-      const data = await response.json();
-      setFundraisers(data.fundraisers || []);
+      // Fetch active fundraisers
+      const activeResponse = await fetch("/api/fundraisers");
+      const activeData = await activeResponse.json();
+      let allFundraisers = activeData.fundraisers || [];
+
+      // If user is logged in, also fetch their own fundraisers (including pending)
+      if (user?.id) {
+        const myResponse = await fetch(`/api/fundraisers?creator=${user.id}`);
+        const myData = await myResponse.json();
+        const myFundraisers = myData.fundraisers || [];
+
+        // Combine and deduplicate (user's fundraisers might already be in active list)
+        const combined = [...allFundraisers];
+        myFundraisers.forEach((myFund: Fundraiser) => {
+          if (!combined.find(f => f._id === myFund._id)) {
+            combined.push(myFund);
+          }
+        });
+        allFundraisers = combined;
+      }
+
+      setFundraisers(allFundraisers);
     } catch (error) {
       console.error("Error fetching fundraisers:", error);
     } finally {
