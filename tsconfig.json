@@ -28,7 +28,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
-, "lib/LanguageSwitcher.tsx"  ],
-  "exclude": ["node_modules"]
+    "**/*.mts",
+    "lib/LanguageSwitcher.tsx"
+  ],
+  "exclude": ["node_modules", "examples"]
 }
+
