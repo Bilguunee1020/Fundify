@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronDown, Menu, X, Heart, User } from "lucide-react";
+import { Search, ChevronDown, Menu, X, Heart, User, Sparkles } from "lucide-react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { useLanguage } from "@/lib/LanguageContext";
 
@@ -11,224 +11,134 @@ export function Header() {
   const { language, setLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [donateDropdownOpen, setDonateDropdownOpen] = useState(false);
-  const [mobileDonateOpen, setMobileDonateOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-card">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-16">
-          {/* Left Navigation */}
-          <nav className="flex-1 hidden md:flex items-center gap-1 justify-start">
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-white/95 backdrop-blur-xl transition-all duration-300">
+      {/* Container-ийг илүү өргөн (1440px) болгож, хоёр тал руу нь татсан */}
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-12">
+        <div className="flex items-center justify-between h-20">
+          
+          {/* Left Navigation - Текстийг илүү тод, smooth болгосон */}
+          <nav className="flex-1 hidden md:flex items-center gap-6">
             <Link
               href="/search"
-              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors"
+              className="group flex items-center gap-2 text-[15px] font-bold text-slate-700 hover:text-primary transition-all duration-300 ease-in-out"
             >
-              <Search className="w-4 h-4" />
-              Хайх
+              <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <span>Хайх</span>
             </Link>
+            
             <div
               className="relative"
               onMouseEnter={() => setDonateDropdownOpen(true)}
               onMouseLeave={() => setDonateDropdownOpen(false)}
             >
-              <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+              <button className="flex items-center gap-1.5 text-[15px] font-bold text-slate-700 hover:text-primary transition-all duration-300">
                 Хандив өгөх
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${donateDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {donateDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-card border border-border rounded-xl shadow-2xl z-50 transition-all duration-300 ease-out opacity-100 scale-100">
-                  <div className="p-4 space-y-4">
+                <div className="absolute top-full left-0 pt-4 w-[450px] animate-in fade-in slide-in-from-top-3 duration-300 ease-out">
+                  <div className="bg-white border border-border rounded-3xl shadow-2xl shadow-primary/10 p-4 overflow-hidden">
                     <Link
                       href="/fundraisers"
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:shadow-lg rounded-lg transition-all duration-200 border border-transparent hover:border-border"
+                      className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-all group"
                     >
-                      <Search className="w-5 h-5 text-primary" />
-                      <span className="font-medium">Discover fundraisers to support</span>
+                      <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                        <Search className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <div className="font-extrabold text-slate-900">Бүх төслүүд</div>
+                        <div className="text-sm text-slate-500 font-medium">Шинэ болон онцлох хандивүүд</div>
+                      </div>
                     </Link>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Link
-                        href="/categories"
-                        className="flex flex-col items-center gap-2 p-4 text-center text-sm text-foreground hover:shadow-lg rounded-none transition-all duration-200 border border-transparent hover:border-border group"
-                      >
-                        <Heart className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="font-medium leading-tight">Categories<br /></span>
-                      </Link>
-                      <Link
-                        href="/categories?type=crisis"
-                        className="flex flex-col items-center gap-2 p-4 text-center text-sm text-foreground hover:shadow-lg rounded-none transition-all duration-200 border border-transparent hover:border-border group"
-                      >
-                        <Heart className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="font-medium leading-tight">Crisis relief<br /></span>
-                      </Link>
-                      <Link
-                        href="/social-impact-funds"
-                        className="flex flex-col items-center gap-2 p-4 text-center text-sm text-foreground hover:shadow-lg rounded-none transition-all duration-200 border border-transparent hover:border-border group"
-                      >
-                        <Heart className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="font-medium leading-tight">Social Impact Funds<br /></span>
-                      </Link>
-                      <Link
-                        href="/supporter-space"
-                        className="flex flex-col items-center gap-2 p-4 text-center text-sm text-foreground hover:shadow-lg rounded-none transition-all duration-200 border border-transparent hover:border-border group"
-                      >
-                        <User className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
-                        <span className="font-medium leading-tight">Supporter Space<br /></span>
-                      </Link>
+
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                      {[
+                        { href: "/categories", label: "Ангилал", icon: Heart },
+                        { href: "/categories?type=crisis", label: "Яаралтай", icon: Sparkles },
+                        { href: "/social-impact-funds", label: "Сангууд", icon: Heart },
+                        { href: "/supporter-space", label: "Тусламж", icon: User },
+                      ].map((item) => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          className="flex flex-col gap-3 p-4 rounded-2xl border border-transparent hover:border-border hover:bg-slate-50 hover:shadow-sm transition-all group"
+                        >
+                          <item.icon className="w-6 h-6 text-primary group-hover:scale-125 transition-transform duration-300" />
+                          <span className="font-bold text-sm text-slate-800">{item.label}</span>
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 </div>
               )}
             </div>
-              <Link
-              href="/fundraisers"
-              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors"
-            >
 
+            <Link
+              href="/fundraisers"
+              className="text-[15px] font-bold text-slate-700 hover:text-primary transition-all duration-300 relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-primary hover:after:w-full after:transition-all"
+            >
               Хандив цуглуулагчид
             </Link>
           </nav>
 
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0 flex items-center gap-1">
-            <span className="text-xl font-bold text-primary tracking-tight">
+          {/* Logo - Төв хэсэгт илүү тод */}
+          <Link href="/" className="flex items-center gap-3 group px-4">
+            <div className="relative flex items-center justify-center">
+              <div className="absolute inset-0 bg-primary/20 blur-lg rounded-full group-hover:bg-primary/40 transition-all" />
+              <div className="relative bg-primary p-2.5 rounded-2xl shadow-lg shadow-primary/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                <Heart className="w-6 h-6 text-white fill-white/20" />
+              </div>
+            </div>
+            <span className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-primary to-slate-900 tracking-tighter">
               Fundify
             </span>
-            <svg viewBox="0 0 24 24" className="w-5 h-5 text-primary -mt-2">
-              <circle cx="12" cy="8" r="3" fill="currentColor" />
-              <path
-                d="M9 11 Q12 15 15 11"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-              />
-            </svg>
           </Link>
 
           {/* Right Navigation */}
-          <nav className="flex-1 hidden md:flex items-center gap-1 justify-end">
-            
-            <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+          <nav className="flex-1 hidden md:flex items-center gap-4 justify-end">
+            <button className="px-3 py-2 text-[15px] font-bold text-slate-600 hover:text-primary transition-colors">
               Тухай
-              <ChevronDown className="w-4 h-4" />
             </button>
             
+            <div className="h-6 w-[1px] bg-slate-200 mx-2" />
+
             <SignedOut>
               <Link
                 href="/auth/sign-in"
-                className="px-3 py-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors"
+                className="px-4 py-2 text-[15px] font-bold text-slate-700 hover:text-primary transition-all"
               >
                 Нэвтрэх
               </Link>
+              <Button asChild className="h-12 px-8 rounded-full font-black text-md shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 bg-primary">
+                <Link href="/donate">Эхлүүлэх</Link>
+              </Button>
             </SignedOut>
+
             <SignedIn>
               <Link
-                href="/profile"
-                className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors"
+                href="/my-fundraisers"
+                className="flex items-center gap-2 px-4 py-2 text-[15px] font-bold text-slate-700 hover:bg-slate-50 rounded-full transition-all"
               >
-                <User className="w-4 h-4" />
+                <User className="w-5 h-5" />
                 Профайл
               </Link>
-              <UserButton />
+              <div className="ml-2 scale-110">
+                <UserButton afterSignOutUrl="/" />
+              </div>
             </SignedIn>
           </nav>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-3 hover:bg-slate-100 rounded-2xl transition-all active:scale-90"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
+            {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
         </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
-            <nav className="flex flex-col gap-2">
-              <Link href="/search" className="px-3 py-2 text-sm font-medium">
-                Search
-              </Link>
-              <button
-                onClick={() => setMobileDonateOpen(!mobileDonateOpen)}
-                className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-left"
-              >
-                Donate
-                <ChevronDown className={`w-4 h-4 transition-transform ${mobileDonateOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {mobileDonateOpen && (
-                <div className="ml-6 mt-2 space-y-2">
-                  <Link
-                    href="/fundraisers"
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:shadow-md rounded-lg transition-all duration-200 border border-transparent hover:border-border"
-                  >
-                    <Search className="w-5 h-5 text-primary" />
-                    <span className="font-medium">Discover fundraisers to support</span>
-                  </Link>
-                  <Link
-                    href="/categories"
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:shadow-md rounded-lg transition-all duration-200 border border-transparent hover:border-border group"
-                  >
-                    <Heart className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-                    <span className="font-medium">Categories – Browse fundraisers by category</span>
-                  </Link>
-                  <Link
-                    href="/categories?type=crisis"
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:shadow-md rounded-lg transition-all duration-200 border border-transparent hover:border-border group"
-                  >
-                    <Heart className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-                    <span className="font-medium">Crisis relief – Donate to verified relief</span>
-                  </Link>
-                  <Link
-                    href="/social-impact-funds"
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:shadow-md rounded-lg transition-all duration-200 border border-transparent hover:border-border group"
-                  >
-                    <Heart className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-                    <span className="font-medium">Social Impact Funds – Direct support for urgent needs</span>
-                  </Link>
-                  <Link
-                    href="/supporter-space"
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:shadow-md rounded-lg transition-all duration-200 border border-transparent hover:border-border group"
-                  >
-                    <User className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-                    <span className="font-medium">Supporter Space – Inspiration, FAQs, and where to give</span>
-                  </Link>
-                </div>
-              )}
-              <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-left">
-                Fundraise
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-left">
-                Тухай
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              <SignedOut>
-                <Link
-                  href="/auth/sign-in"
-                  className="px-3 py-2 text-sm font-medium"
-                >
-                  Sign in
-                </Link>
-              </SignedOut>
-              <SignedIn>
-                <div className="px-3 py-2">
-                  <UserButton />
-                </div>
-              </SignedIn>
-              <div className="px-3 pt-2">
-                <Button asChild className="w-full rounded-full">
-                  <Link href="/donate" className="font-black">Start a Fundify</Link>
-                </Button>
-              </div>
-            </nav>
-          </div>
-        )}
       </div>
     </header>
   );

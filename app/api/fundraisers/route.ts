@@ -61,6 +61,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Validate title length (model requires minlength: 5)
+    if (title.length < 5) {
+      return NextResponse.json({ error: 'Title must be at least 5 characters' }, { status: 400 });
+    }
+
+    // Validate description length (model requires minlength: 20)
+    if (description.length < 20) {
+      return NextResponse.json({ error: 'Description must be at least 20 characters' }, { status: 400 });
+    }
+
     // Get or create user details
     let user = await User.findOne({ clerkId: creator });
     if (!user) {
@@ -104,8 +114,15 @@ export async function POST(request: Request) {
       fundraiser,
       approvalRequest 
     }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating fundraiser:', error);
+    
+    // Handle Mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map((err: any) => err.message);
+      return NextResponse.json({ error: validationErrors[0] || 'Validation error', details: validationErrors }, { status: 400 });
+    }
+    
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

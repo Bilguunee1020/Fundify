@@ -12,18 +12,14 @@ import {
   Flame,
   PawPrint,
   TreePine,
-  Briefcase,
   Users,
-  Palette,
-  Calendar,
   Church,
   Trophy,
-  Plane,
   HandHeart,
-  Star,
-  Home,
-  Car,
   ArrowLeft,
+  ChevronRight,
+  Camera,
+  CheckCircle2,
 } from "lucide-react";
 
 const categories = [
@@ -41,22 +37,13 @@ const categories = [
   { id: "volunteer", name: "Volunteer", icon: HandHeart },
 ];
 
-interface FormData {
-  forWhom: string;
-  goal: number;
-  title: string;
-  description: string;
-  category: string;
-  image: string;
-}
-
 export default function StartFundmePage() {
   const { user } = useUser();
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     forWhom: "",
     goal: 0,
     title: "",
@@ -65,553 +52,303 @@ export default function StartFundmePage() {
     image: "",
   });
 
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(currentStep + 1);
-      setErrors({});
-    }
-  };
-
-  const prevStep = () => {
-    setCurrentStep(currentStep - 1);
-    setErrors({});
-  };
-
-  const validateStep = (step: number): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (step === 1) {
-      if (!formData.category) {
-        newErrors.category = "Please select a category";
-      }
-    } else if (step === 2) {
-      if (!formData.forWhom) {
-        newErrors.forWhom = "Please select who this fundraiser is for";
-      }
-    } else if (step === 3) {
-      if (!formData.goal || formData.goal < 1) {
-        newErrors.goal = "Goal must be at least $1";
-      }
-    } else if (step === 4) {
-      // no validation for photo
-    } else if (step === 5) {
-      if (!formData.title || formData.title.length < 5) {
-        newErrors.title = "Title must be at least 5 characters";
-      }
-      if (!formData.description || formData.description.length < 20) {
-        newErrors.description = "Description must be at least 20 characters";
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (field: keyof FormData, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && user?.id) {
-      try {
-        // Create FormData for the API request
-        const formDataUpload = new FormData();
-        formDataUpload.append("file", file);
-        formDataUpload.append("userId", user.id);
-
-        // Upload via API route
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formDataUpload,
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          // Store the URL in form data
-          setFormData((prev) => ({ ...prev, image: result.url }));
-        } else {
-          const errorData = await response.json();
-          alert(`Upload failed: ${errorData.error}`);
-        }
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        alert("Failed to upload image. Please try again.");
-      }
-    }
-  };
-
+  // Submit fundraiser to API
   const handleSubmit = async () => {
-    if (!validateStep(5)) return;
-
+    if (!user) return;
+    
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/fundraisers", {
-        method: "POST",
+      const response = await fetch('/api/fundraisers', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
-          creator: user?.id,
-          userEmail: user?.primaryEmailAddress?.emailAddress,
-          firstName: user?.firstName,
-          lastName: user?.lastName,
+          title: formData.title,
+          description: formData.description,
+          goal: formData.goal,
+          category: formData.category,
+          image: formData.image,
+          forWhom: formData.forWhom,
+          creator: user.id,
+          userEmail: user.primaryEmailAddress?.emailAddress,
+          firstName: user.firstName,
+          lastName: user.lastName,
         }),
       });
 
       if (response.ok) {
-        alert("Fundraiser created successfully!");
-        router.push("/my-fundraisers");
+        // Redirect to my-fundraisers page after successful submission
+        router.push('/my-fundraisers');
       } else {
-        const errorData = await response.json();
-        alert(
-          `Failed to create fundraiser: ${errorData.error || "Unknown error"}`,
-        );
+        const data = await response.json();
+        setErrors({ submit: data.error || 'Failed to create fundraiser' });
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred");
+      console.error('Error creating fundraiser:', error);
+      setErrors({ submit: 'An error occurred. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const getStepTitle = (step: number): string => {
-    switch (step) {
-      case 1:
-        return "Choose Category";
-      case 2:
-        return "Who's it for?";
-      case 3:
-        return "Set Goal";
-      case 4:
-        return "Add Photo";
-      case 5:
-        return "Tell Your Story";
-      case 6:
-        return "Review & Create";
-      default:
-        return "Step";
-    }
+  // Автоматаар дараагийн алхам руу шилжих (Smooth Transition)
+  const handleAutoNext = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setTimeout(() => {
+      setCurrentStep((prev) => prev + 1);
+    }, 400); // Сонголтыг нүдэнд харагдуулаад шилжих хугацаа
   };
+
+  const nextStep = () => setCurrentStep(currentStep + 1);
+  const prevStep = () => setCurrentStep(currentStep - 1);
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-foreground">
-              Select a Category
-            </h2>
-            <div className="grid grid-cols-3 gap-4">
-              {categories.map((category, index) => {
-                const Icon = category.icon;
-                const isSelected = formData.category === category.id;
-                return (
-                  <button
-                    key={category.id}
-                    onClick={() => handleInputChange("category", category.id)}
-                    className={`group relative p-6 rounded-2xl border-2 transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:shadow-purple-500/20 overflow-hidden ${
-                      isSelected
-                        ? "bg-gradient-to-br from-blue-500 to-purple-600 border-transparent text-white shadow-xl shadow-blue-500/30"
-                        : "bg-white/80 backdrop-blur-sm border-gray-200 hover:border-purple-300 hover:bg-gradient-to-br hover:from-purple-50 hover:to-blue-50"
-                    }`}
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    {isSelected && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 animate-pulse" />
-                    )}
-                    <div className="relative flex flex-col items-center gap-3">
-                      <div
-                        className={`p-3 rounded-full transition-all duration-300 ${
-                          isSelected
-                            ? "bg-white/20 scale-110"
-                            : "bg-gradient-to-br from-purple-100 to-blue-100 group-hover:from-purple-200 group-hover:to-blue-200"
-                        }`}
-                      >
-                        <Icon
-                          className={`w-8 h-8 transition-colors duration-300 ${
-                            isSelected
-                              ? "text-white"
-                              : "text-purple-600 group-hover:text-purple-700"
-                          }`}
-                        />
-                      </div>
-                      <span
-                        className={`text-sm font-semibold text-center transition-colors duration-300 ${
-                          isSelected
-                            ? "text-white"
-                            : "text-gray-700 group-hover:text-purple-700"
-                        }`}
-                      >
-                        {category.name}
-                      </span>
+          <div className="grid grid-cols-3 gap-3 animate-in fade-in zoom-in-95 duration-500">
+            {categories.map((cat) => {
+              const Icon = cat.icon;
+              const isSelected = formData.category === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => handleAutoNext("category", cat.id)}
+                  className={`group p-4 rounded-2xl border-2 transition-all duration-300 ${
+                    isSelected
+                      ? "bg-gradient-to-br from-blue-500 to-purple-600 border-transparent text-white shadow-lg scale-95"
+                      : "bg-white/60 border-gray-100 hover:border-purple-300 hover:shadow-md"
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <div className={`p-2 rounded-full ${isSelected ? "bg-white/20" : "bg-purple-50 group-hover:bg-purple-100"}`}>
+                      <Icon className={`w-6 h-6 ${isSelected ? "text-white" : "text-purple-600"}`} />
                     </div>
-                    {isSelected && (
-                      <div className="absolute top-2 right-2 w-3 h-3 bg-white rounded-full animate-ping" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {errors.category && (
-              <p className="text-destructive text-sm">{errors.category}</p>
-            )}
+                    <span className="text-xs font-semibold">{cat.name}</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         );
-
       case 2:
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-foreground">
-              Who is this fundraiser for?
-            </h2>
-            <div className="space-y-4">
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-8 duration-500">
+            {[
+              { id: "myself", title: "Myself", icon: Heart, desc: "For my own cause" },
+              { id: "someone_else", title: "Someone else", icon: Users, desc: "For a friend or family" }
+            ].map((item) => (
               <button
-                type="button"
-                onClick={() => handleInputChange("forWhom", "myself")}
-                className={`group w-full p-6 border-2 rounded-2xl text-left transition-all duration-300 hover:scale-105 hover:shadow-lg ${
-                  formData.forWhom === "myself"
-                    ? "border-blue-500 bg-gradient-to-r from-blue-50 to-purple-50 shadow-lg shadow-blue-500/20"
-                    : "border-gray-200 hover:border-purple-300 bg-white/80 backdrop-blur-sm"
+                key={item.id}
+                onClick={() => handleAutoNext("forWhom", item.id)}
+                className={`w-full p-6 rounded-2xl border-2 flex items-center gap-4 transition-all duration-300 ${
+                  formData.forWhom === item.id 
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 border-transparent text-white shadow-xl" 
+                    : "bg-white/60 border-gray-100 hover:border-purple-300"
                 }`}
               >
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`p-3 rounded-full transition-all duration-300 ${
-                      formData.forWhom === "myself"
-                        ? "bg-blue-500 text-white"
-                        : "bg-purple-100 text-purple-600 group-hover:bg-purple-200"
-                    }`}
-                  >
-                    <Heart className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <div
-                      className={`font-semibold text-lg transition-colors duration-300 ${
-                        formData.forWhom === "myself"
-                          ? "text-blue-700"
-                          : "text-gray-800"
-                      }`}
-                    >
-                      Myself
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      I'm raising money for my own cause
-                    </div>
-                  </div>
+                <item.icon className={`w-8 h-8 ${formData.forWhom === item.id ? "text-white" : "text-purple-500"}`} />
+                <div className="text-left">
+                  <div className="font-bold text-lg">{item.title}</div>
+                  <div className={`text-sm ${formData.forWhom === item.id ? "text-white/80" : "text-gray-500"}`}>{item.desc}</div>
                 </div>
               </button>
-              <button
-                type="button"
-                onClick={() => handleInputChange("forWhom", "someone_else")}
-                className={`group w-full p-6 border-2 rounded-2xl text-left transition-all duration-300 hover:scale-105 hover:shadow-lg ${
-                  formData.forWhom === "someone_else"
-                    ? "border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-lg shadow-purple-500/20"
-                    : "border-gray-200 hover:border-purple-300 bg-white/80 backdrop-blur-sm"
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`p-3 rounded-full transition-all duration-300 ${
-                      formData.forWhom === "someone_else"
-                        ? "bg-purple-500 text-white"
-                        : "bg-pink-100 text-pink-600 group-hover:bg-pink-200"
-                    }`}
-                  >
-                    <Users className="w-6 h-6" />
+            ))}
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
+             <h2 className="text-2xl font-bold text-gray-800">Set your goal</h2>
+             <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-3xl font-bold text-purple-600">$</span>
+                <input 
+                  type="number" 
+                  autoFocus
+                  onChange={(e) => setFormData({...formData, goal: parseFloat(e.target.value)})}
+                  className="w-full pl-12 pr-4 py-6 text-4xl font-bold bg-transparent border-b-4 border-purple-200 focus:border-purple-500 outline-none transition-all"
+                  placeholder="0"
+                />
+             </div>
+             <p className="text-gray-500">Most fundraisers raise between $500 and $5,000.</p>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
+            <h2 className="text-2xl font-bold text-gray-800">Add a photo</h2>
+            <div className="relative group cursor-pointer border-2 border-dashed border-purple-200 rounded-3xl p-8 bg-white/40 hover:bg-white transition-all text-center">
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setFormData({ ...formData, image: reader.result as string });
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }} 
+                className="absolute inset-0 opacity-0 cursor-pointer" 
+              />
+              {formData.image ? (
+                <img src={formData.image} alt="Preview" className="mx-auto max-h-48 rounded-2xl shadow-lg object-cover" />
+              ) : (
+                <div className="py-8">
+                  <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Camera className="w-8 h-8 text-purple-600" />
                   </div>
-                  <div>
-                    <div
-                      className={`font-semibold text-lg transition-colors duration-300 ${
-                        formData.forWhom === "someone_else"
-                          ? "text-purple-700"
-                          : "text-gray-800"
-                      }`}
-                    >
-                      Someone else
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      I'm raising money for someone else's cause
-                    </div>
-                  </div>
+                  <p className="text-purple-600 font-bold">Click to upload photo</p>
                 </div>
-              </button>
+              )}
             </div>
-            {errors.forWhom && (
-              <p className="text-destructive text-sm">{errors.forWhom}</p>
+          </div>
+        );
+      case 5:
+        return (
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
+            <h2 className="text-2xl font-bold text-gray-800">Tell your story</h2>
+            <input
+              type="text"
+              placeholder="Fundraiser Title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full text-xl font-bold p-4 rounded-xl bg-white/50 border-2 border-transparent focus:border-purple-500 outline-none shadow-sm"
+            />
+            <textarea
+              placeholder="Tell your story..."
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full min-h-[150px] p-4 rounded-xl bg-white/50 border-2 border-transparent focus:border-purple-500 outline-none shadow-sm resize-none"
+            />
+          </div>
+        );
+      case 6:
+        return (
+          <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
+            <h2 className="text-2xl font-bold text-gray-800">Review</h2>
+            <div className="bg-white/80 p-6 rounded-3xl border-2 border-purple-100 space-y-4">
+               <div className="flex justify-between items-center">
+                  <span className="text-xs font-black uppercase text-purple-400">Target Goal</span>
+                  <span className="text-2xl font-black text-purple-600">${formData.goal}</span>
+               </div>
+               <div className="border-t pt-4">
+                  <h4 className="font-bold text-gray-800">{formData.title}</h4>
+                  <p className="text-sm text-gray-500 line-clamp-2 mt-1">{formData.description}</p>
+               </div>
+               {formData.image && <img src={formData.image} className="w-full h-32 object-cover rounded-xl" />}
+            </div>
+            <div className="flex items-center gap-2 text-blue-600 bg-blue-50 p-3 rounded-xl">
+               <CheckCircle2 className="w-4 h-4" />
+               <span className="text-xs font-bold">Ready to be published!</span>
+            </div>
+            {errors.submit && (
+              <div className="text-red-500 text-sm bg-red-50 p-3 rounded-xl">
+                {errors.submit}
+              </div>
             )}
           </div>
         );
-
-      case 3:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-foreground">
-              How much do you need to raise?
-            </h2>
-            <div className="space-y-3">
-              <label className="block text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                <span className="text-2xl">💰</span>
-                Goal Amount ($)
-              </label>
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-semibold text-lg">
-                  $
-                </div>
-                <input
-                  type="number"
-                  value={formData.goal || ""}
-                  onChange={(e) =>
-                    handleInputChange("goal", parseFloat(e.target.value) || 0)
-                  }
-                  placeholder="5000"
-                  className="w-full pl-8 pr-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all duration-300 bg-white/80 backdrop-blur-sm"
-                  min="1"
-                />
-              </div>
-              {errors.goal && (
-                <p className="text-red-500 text-sm mt-2 flex items-center gap-2">
-                  <span className="text-red-500">⚠️</span>
-                  {errors.goal}
-                </p>
-              )}
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-foreground">
-              Add a picture for your fundraiser
-            </h2>
-            <div>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="w-full"
-              />
-              {formData.image && (
-                <div className="mt-4">
-                  <img
-                    src={formData.image}
-                    alt="Preview"
-                    className="max-w-full h-48 object-cover rounded-md"
-                  />
-                </div>
-              )}
-              <div className="mt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setCurrentStep(5)}
-                >
-                  Skip
-                </Button>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-foreground">
-              What's the reason for your fundraiser?
-            </h2>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Fundraiser Title
-              </label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => handleInputChange("title", e.target.value)}
-                placeholder="e.g., Help me buy a new laptop for college"
-                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              {errors.title && (
-                <p className="text-destructive text-sm mt-1">{errors.title}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Story
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) =>
-                  handleInputChange("description", e.target.value)
-                }
-                placeholder="Tell your story and why people should support you..."
-                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary min-h-[120px]"
-              />
-              {errors.description && (
-                <p className="text-destructive text-sm mt-1">
-                  {errors.description}
-                </p>
-              )}
-            </div>
-          </div>
-        );
-
-      case 6:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-foreground">
-              Review Your Fundraiser
-            </h2>
-            <div className="space-y-4">
-              <p>
-                <strong>Category:</strong> {formData.category}
-              </p>
-              <p>
-                <strong>For:</strong>{" "}
-                {formData.forWhom === "myself" ? "Myself" : "Someone else"}
-              </p>
-              <p>
-                <strong>Goal:</strong> ${formData.goal}
-              </p>
-              <p>
-                <strong>Title:</strong> {formData.title}
-              </p>
-              <p>
-                <strong>Description:</strong> {formData.description}
-              </p>
-              {formData.image ? (
-                <div>
-                  <strong>Image:</strong>
-                  <img
-                    src={formData.image}
-                    alt="Fundraiser"
-                    className="max-w-full h-48 object-cover rounded-md mt-2"
-                  />
-                </div>
-              ) : (
-                <p>
-                  <strong>Image:</strong> No image selected
-                </p>
-              )}
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
+      default: return null;
     }
   };
 
   return (
     <>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
+      <SignedOut><RedirectToSignIn /></SignedOut>
       <SignedIn>
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-          {/* Enhanced Decorative background elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-0 left-0 w-full h-full">
-              <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse" />
-              <div
-                className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-blue-400/15 to-cyan-400/15 rounded-full blur-3xl animate-pulse"
-                style={{ animationDelay: "1s" }}
-              />
-              <div
-                className="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-r from-indigo-400/10 to-purple-400/10 rounded-full blur-3xl animate-pulse"
-                style={{ animationDelay: "2s" }}
-              />
-              <div
-                className="absolute top-1/2 right-1/4 w-64 h-64 bg-gradient-to-r from-pink-300/5 to-purple-300/5 rounded-full blur-2xl animate-pulse"
-                style={{ animationDelay: "0.5s" }}
-              />
-            </div>
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+          
+          {/* Background Decor */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-200/40 rounded-full blur-[100px] animate-pulse" />
+             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-200/40 rounded-full blur-[100px] animate-pulse" />
           </div>
 
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Back
-            </button>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Panel - Info */}
-              <div className="bg-card/50 backdrop-blur-sm rounded-2xl shadow-xl border border-border/50 p-8 lg:p-12">
-                <div className="space-y-6">
-                  <div className="text-center lg:text-left">
-                    <h3 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-4">
-                      Start Your Fundraiser
-                    </h3>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
-                      Create a fundraiser to support causes that matter to you.
-                      Choose a category, set your goal, and share your story
-                      with the world.
-                    </p>
-                  </div>
-                </div>
-              </div>
+          <div className="max-w-7xl w-full flex flex-col lg:flex-row bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 overflow-hidden relative z-10">
+            
+            {/* Left Column - Sidebar Info */}
+            <div className="lg:w-1/3 p-8 lg:p-12 bg-gradient-to-b from-purple-600/10 to-transparent border-r border-white/20">
+              <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-600 font-semibold hover:gap-3 transition-all mb-12">
+                <ArrowLeft className="w-4 h-4" /> Back
+              </button>
+              
+              <div className="space-y-6">
+                <h1 className="text-4xl font-black text-gray-900 leading-tight">
+                  Start Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Impact</span>
+                </h1>
+                <p className="text-gray-600 text-lg">
+                  Every big change starts with a small step. Tell us about your cause.
+                </p>
 
-              {/* Right Panel - Form */}
-              <div className="bg-card/80 backdrop-blur-sm rounded-2xl shadow-xl border border-border/50 p-8 lg:p-12">
-                <div className="space-y-8">
-                  {/* Progress Indicator */}
-                  <div className="text-center">
-                    <div className="mb-4">
-                      <div className="text-sm text-muted-foreground font-medium mb-2">
-                        Step {currentStep} of 6 • {getStepTitle(currentStep)}
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
-                        <div
-                          className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full transition-all duration-500 ease-out"
-                          style={{ width: `${(currentStep / 6) * 100}%` }}
-                        ></div>
+                {/* Vertical Progress */}
+                <div className="pt-8 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold shadow-lg">
+                      {currentStep}
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-purple-400 uppercase tracking-widest">Current Step</div>
+                      <div className="font-bold text-gray-800 uppercase tracking-tighter">
+                         Step {currentStep} of 6
                       </div>
                     </div>
                   </div>
-
-                  {/* Form Content */}
-                  <div className="space-y-6">{renderStep()}</div>
-
-                  {/* Navigation Buttons */}
-                  <div className="flex justify-between items-center pt-6 border-t border-border/50">
-                    {currentStep > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={prevStep}
-                        className="group hover:bg-primary/10 hover:border-primary transition-all duration-300"
-                      >
-                        <span className="group-hover:text-primary transition-colors">
-                          ← Previous
-                        </span>
-                      </Button>
-                    )}
-                    {currentStep < 6 ? (
-                      <Button
-                        type="button"
-                        onClick={nextStep}
-                        className="ml-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-primary/20 transition-all duration-300 transform hover:scale-105"
-                      >
-                        Next →
-                      </Button>
-                    ) : (
-                      <Button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className="ml-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-primary/20 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isSubmitting ? "Creating..." : "Create Fundraiser"}
-                      </Button>
-                    )}
+                  {/* Progress Bar */}
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-1000 ease-out"
+                      style={{ width: `${(currentStep / 6) * 100}%` }}
+                    />
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* Right Column - Form Steps */}
+            <div className="lg:w-2/3 p-8 lg:p-16 flex flex-col min-h-[550px]">
+              <div className="flex-grow">
+                {/* Header for Step */}
+                <div className="flex justify-between items-center mb-10">
+                   <h3 className="text-xl font-bold text-gray-400">0{currentStep} —</h3>
+                   {currentStep > 1 && (
+                     <button onClick={prevStep} className="text-sm font-bold text-purple-500 hover:underline">
+                       ← Prev Step
+                     </button>
+                   )}
+                </div>
+
+                {/* Step Content */}
+                <div className="relative">
+                   {renderStep()}
+                </div>
+              </div>
+
+              {/* Navigation Footer */}
+              <div className="mt-12 flex justify-end">
+                {currentStep >= 3 && currentStep < 6 && (
+                  <Button 
+                    onClick={nextStep}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-xl hover:shadow-purple-200 rounded-full px-12 py-7 text-lg font-bold transition-all hover:scale-105"
+                  >
+                    Continue <ChevronRight className="ml-2 w-5 h-5" />
+                  </Button>
+                )}
+                {currentStep === 6 && (
+                   <Button 
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="bg-green-600 hover:bg-green-700 w-full rounded-full py-7 text-xl font-black shadow-xl disabled:opacity-50"
+                   >
+                     {isSubmitting ? "Creating..." : "CREATE FUNDRAISER 🚀"}
+                   </Button>
+                )}
+              </div>
+            </div>
+
           </div>
         </div>
       </SignedIn>
