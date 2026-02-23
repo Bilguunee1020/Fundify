@@ -43,12 +43,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans antialiased min-h-screen`}>
-        <ClerkProvider>
-          <LanguageProvider>
-            {children}
-            <Analytics />
-          </LanguageProvider>
-        </ClerkProvider>
+        {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && (
+          <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+            <LanguageProvider>
+              {children}
+              <Analytics />
+            </LanguageProvider>
+          </ClerkProvider>
+        )}
         <Toaster 
           position="top-center"
           toastOptions={{
