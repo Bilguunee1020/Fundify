@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { SignedIn, SignedOut, RedirectToSignIn, useUser } from "@clerk/nextjs";
 import { ArrowLeft, Heart, CreditCard, Lock } from "lucide-react";
+import { toast } from "sonner";
 
 const PRESET_AMOUNTS = [50, 100, 200, 300, 500, 1000];
 
@@ -95,7 +96,10 @@ export default function DonatePage() {
 
       if (response.ok) {
         const data = await response.json();
-        alert("Thank you for your donation!");
+        toast.success("cool message", {
+          duration: 2000,
+          position: "top-center",
+        });
         router.push(`/fundraisers/${fundraiserId}`);
       } else {
         const data = await response.json();
