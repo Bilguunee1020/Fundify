@@ -11,7 +11,7 @@ import {
   GraduationCap,
   Stethoscope,
   Flame,
-  PawPrint,
+  PawPrint,x
   TreePine,
   Briefcase,
   Users,
