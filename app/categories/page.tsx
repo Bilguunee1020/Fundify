@@ -45,17 +45,11 @@ const categories = [
   { id: "education", name: "Education", icon: GraduationCap },
   { id: "animals", name: "Animal", icon: PawPrint },
   { id: "environment", name: "Environment", icon: TreePine },
-  { id: "business", name: "Business", icon: Briefcase },
   { id: "community", name: "Community", icon: Users },
-  { id: "creative", name: "Creative", icon: Palette },
-  { id: "event", name: "Event", icon: Calendar },
   { id: "faith", name: "Faith", icon: Church },
   { id: "family", name: "Family", icon: Users },
   { id: "sports", name: "Sports", icon: Trophy },
-  { id: "travel", name: "Travel", icon: Plane },
   { id: "volunteer", name: "Volunteer", icon: HandHeart },
-  { id: "wishes", name: "Wishes", icon: Star },
-  { id: "competition", name: "Competition", icon: Trophy },
 ];
 
 export default function CategoriesPage() {

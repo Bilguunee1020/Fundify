@@ -34,17 +34,11 @@ const categories = [
   { id: "education", name: "Education", icon: GraduationCap },
   { id: "animals", name: "Animal", icon: PawPrint },
   { id: "environment", name: "Environment", icon: TreePine },
-  { id: "business", name: "Business", icon: Briefcase },
   { id: "community", name: "Community", icon: Users },
-  { id: "creative", name: "Creative", icon: Palette },
-  { id: "event", name: "Event", icon: Calendar },
   { id: "faith", name: "Faith", icon: Church },
   { id: "family", name: "Family", icon: Users },
   { id: "sports", name: "Sports", icon: Trophy },
-  { id: "travel", name: "Travel", icon: Plane },
   { id: "volunteer", name: "Volunteer", icon: HandHeart },
-  { id: "wishes", name: "Wishes", icon: Star },
-  { id: "competition", name: "Competition", icon: Trophy },
 ];
 
 interface FormData {
@@ -123,12 +117,12 @@ export default function StartFundmePage() {
       try {
         // Create FormData for the API request
         const formDataUpload = new FormData();
-        formDataUpload.append('file', file);
-        formDataUpload.append('userId', user.id);
+        formDataUpload.append("file", file);
+        formDataUpload.append("userId", user.id);
 
         // Upload via API route
-        const response = await fetch('/api/upload', {
-          method: 'POST',
+        const response = await fetch("/api/upload", {
+          method: "POST",
           body: formDataUpload,
         });
 
@@ -141,8 +135,8 @@ export default function StartFundmePage() {
           alert(`Upload failed: ${errorData.error}`);
         }
       } catch (error) {
-        console.error('Error uploading image:', error);
-        alert('Failed to upload image. Please try again.');
+        console.error("Error uploading image:", error);
+        alert("Failed to upload image. Please try again.");
       }
     }
   };
@@ -171,7 +165,9 @@ export default function StartFundmePage() {
         router.push("/my-fundraisers");
       } else {
         const errorData = await response.json();
-        alert(`Failed to create fundraiser: ${errorData.error || 'Unknown error'}`);
+        alert(
+          `Failed to create fundraiser: ${errorData.error || "Unknown error"}`,
+        );
       }
     } catch (error) {
       console.error("Error:", error);
@@ -282,17 +278,25 @@ export default function StartFundmePage() {
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-full transition-all duration-300 ${
-                    formData.forWhom === "myself"
-                      ? "bg-blue-500 text-white"
-                      : "bg-purple-100 text-purple-600 group-hover:bg-purple-200"
-                  }`}>
+                  <div
+                    className={`p-3 rounded-full transition-all duration-300 ${
+                      formData.forWhom === "myself"
+                        ? "bg-blue-500 text-white"
+                        : "bg-purple-100 text-purple-600 group-hover:bg-purple-200"
+                    }`}
+                  >
                     <Heart className="w-6 h-6" />
                   </div>
                   <div>
-                    <div className={`font-semibold text-lg transition-colors duration-300 ${
-                      formData.forWhom === "myself" ? "text-blue-700" : "text-gray-800"
-                    }`}>Myself</div>
+                    <div
+                      className={`font-semibold text-lg transition-colors duration-300 ${
+                        formData.forWhom === "myself"
+                          ? "text-blue-700"
+                          : "text-gray-800"
+                      }`}
+                    >
+                      Myself
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       I'm raising money for my own cause
                     </div>
@@ -309,17 +313,25 @@ export default function StartFundmePage() {
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-full transition-all duration-300 ${
-                    formData.forWhom === "someone_else"
-                      ? "bg-purple-500 text-white"
-                      : "bg-pink-100 text-pink-600 group-hover:bg-pink-200"
-                  }`}>
+                  <div
+                    className={`p-3 rounded-full transition-all duration-300 ${
+                      formData.forWhom === "someone_else"
+                        ? "bg-purple-500 text-white"
+                        : "bg-pink-100 text-pink-600 group-hover:bg-pink-200"
+                    }`}
+                  >
                     <Users className="w-6 h-6" />
                   </div>
                   <div>
-                    <div className={`font-semibold text-lg transition-colors duration-300 ${
-                      formData.forWhom === "someone_else" ? "text-purple-700" : "text-gray-800"
-                    }`}>Someone else</div>
+                    <div
+                      className={`font-semibold text-lg transition-colors duration-300 ${
+                        formData.forWhom === "someone_else"
+                          ? "text-purple-700"
+                          : "text-gray-800"
+                      }`}
+                    >
+                      Someone else
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       I'm raising money for someone else's cause
                     </div>
@@ -503,9 +515,18 @@ export default function StartFundmePage() {
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute top-0 left-0 w-full h-full">
               <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-blue-400/15 to-cyan-400/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-              <div className="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-r from-indigo-400/10 to-purple-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-              <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-gradient-to-r from-pink-300/5 to-purple-300/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '0.5s' }} />
+              <div
+                className="absolute top-40 right-10 w-80 h-80 bg-gradient-to-r from-blue-400/15 to-cyan-400/15 rounded-full blur-3xl animate-pulse"
+                style={{ animationDelay: "1s" }}
+              />
+              <div
+                className="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-r from-indigo-400/10 to-purple-400/10 rounded-full blur-3xl animate-pulse"
+                style={{ animationDelay: "2s" }}
+              />
+              <div
+                className="absolute top-1/2 right-1/4 w-64 h-64 bg-gradient-to-r from-pink-300/5 to-purple-300/5 rounded-full blur-2xl animate-pulse"
+                style={{ animationDelay: "0.5s" }}
+              />
             </div>
           </div>
 
@@ -530,52 +551,6 @@ export default function StartFundmePage() {
                       Choose a category, set your goal, and share your story
                       with the world.
                     </p>
-                  </div>
-
-                  {/* Category Icons Grid */}
-                  <div className="grid grid-cols-3 gap-6 mt-8">
-                    {categories.slice(0, 6).map((category) => {
-                      const Icon = category.icon;
-                      return (
-                        <div
-                          key={category.id}
-                          className="group flex flex-col items-center text-center p-6 rounded-xl hover:bg-primary/10 transition-all duration-300 hover:scale-105"
-                        >
-                          <div className="p-4 bg-primary/10 rounded-full mb-4 group-hover:bg-primary/20 transition-colors">
-                            <Icon className="w-8 h-8 text-primary" />
-                          </div>
-                          <span className="text-sm font-medium text-foreground">
-                            {category.name}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-border/50">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">
-                        $1B+
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        Raised
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">
-                        50M+
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        Donors
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">
-                        100%
-                      </div>
-                      <div className="text-xs text-muted-foreground">Safe</div>
-                    </div>
                   </div>
                 </div>
               </div>
