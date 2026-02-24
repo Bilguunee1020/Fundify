@@ -23,18 +23,18 @@ import {
 } from "lucide-react";
 
 const categories = [
-  { id: "medical", name: "Medical", icon: Stethoscope },
-  { id: "memorial", name: "Memorial", icon: Heart },
-  { id: "emergency", name: "Emergency", icon: Flame },
-  { id: "nonprofit", name: "Nonprofit", icon: Users },
-  { id: "education", name: "Education", icon: GraduationCap },
-  { id: "animals", name: "Animal", icon: PawPrint },
-  { id: "environment", name: "Environment", icon: TreePine },
-  { id: "community", name: "Community", icon: Users },
-  { id: "faith", name: "Faith", icon: Church },
-  { id: "family", name: "Family", icon: Users },
-  { id: "sports", name: "Sports", icon: Trophy },
-  { id: "volunteer", name: "Volunteer", icon: HandHeart },
+  { id: "medical", name: "Эрүүл мэнд", icon: Stethoscope },
+  { id: "memorial", name: "Дурсгал", icon: Heart },
+  { id: "emergency", name: "Яаралтай тусламж", icon: Flame },
+  { id: "nonprofit", name: "Урлаг, соёл", icon: Users },
+  { id: "education", name: "Боловсрол", icon: GraduationCap },
+  { id: "animals", name: "Амьтан", icon: PawPrint },
+  { id: "environment", name: "Байгаль орчин", icon: TreePine },
+  { id: "community", name: "Олон нийт", icon: Users },
+  { id: "faith", name: "Шашин шүтлэг", icon: Church },
+  { id: "family", name: "Гэр бүл", icon: Users },
+  { id: "sports", name: "Спорт", icon: Trophy },
+  { id: "volunteer", name: "Сайн дурын ажил", icon: HandHeart },
 ];
 
 export default function StartFundmePage() {
@@ -52,7 +52,6 @@ export default function StartFundmePage() {
     image: "",
   });
 
-  // Submit fundraiser to API
   const handleSubmit = async () => {
     if (!user) return;
     
@@ -78,26 +77,24 @@ export default function StartFundmePage() {
       });
 
       if (response.ok) {
-        // Redirect to my-fundraisers page after successful submission
         router.push('/my-fundraisers');
       } else {
         const data = await response.json();
-        setErrors({ submit: data.error || 'Failed to create fundraiser' });
+        setErrors({ submit: data.error || 'Хандив үүсгэхэд алдаа гарлаа' });
       }
     } catch (error) {
       console.error('Error creating fundraiser:', error);
-      setErrors({ submit: 'An error occurred. Please try again.' });
+      setErrors({ submit: 'Алдаа гарлаа. Дахин оролдоно уу.' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Автоматаар дараагийн алхам руу шилжих (Smooth Transition)
   const handleAutoNext = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setTimeout(() => {
       setCurrentStep((prev) => prev + 1);
-    }, 400); // Сонголтыг нүдэнд харагдуулаад шилжих хугацаа
+    }, 400);
   };
 
   const nextStep = () => setCurrentStep(currentStep + 1);
@@ -136,8 +133,8 @@ export default function StartFundmePage() {
         return (
           <div className="space-y-4 animate-in fade-in slide-in-from-right-8 duration-500">
             {[
-              { id: "myself", title: "Myself", icon: Heart, desc: "For my own cause" },
-              { id: "someone_else", title: "Someone else", icon: Users, desc: "For a friend or family" }
+              { id: "myself", title: "Өөртөө", icon: Heart, desc: "Миний хувийн хэрэгцээнд" },
+              { id: "someone_else", title: "Бусдад", icon: Users, desc: "Найз нөхөд эсвэл гэр бүлдээ" }
             ].map((item) => (
               <button
                 key={item.id}
@@ -160,9 +157,9 @@ export default function StartFundmePage() {
       case 3:
         return (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
-             <h2 className="text-2xl font-bold text-gray-800">Set your goal</h2>
+             <h2 className="text-2xl font-bold text-gray-800">Зорилтот дүнгээ оруулна уу</h2>
              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-3xl font-bold text-purple-600">$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-3xl font-bold text-purple-600">₮</span>
                 <input 
                   type="number" 
                   autoFocus
@@ -171,13 +168,13 @@ export default function StartFundmePage() {
                   placeholder="0"
                 />
              </div>
-             <p className="text-gray-500">Most fundraisers raise between $500 and $5,000.</p>
+             <p className="text-gray-500">Ихэнх хандивын аянууд 500,000₮-өөс 5,000,000₮ хооронд байдаг.</p>
           </div>
         );
       case 4:
         return (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
-            <h2 className="text-2xl font-bold text-gray-800">Add a photo</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Зураг нэмэх</h2>
             <div className="relative group cursor-pointer border-2 border-dashed border-purple-200 rounded-3xl p-8 bg-white/40 hover:bg-white transition-all text-center">
               <input 
                 type="file" 
@@ -201,7 +198,7 @@ export default function StartFundmePage() {
                   <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Camera className="w-8 h-8 text-purple-600" />
                   </div>
-                  <p className="text-purple-600 font-bold">Click to upload photo</p>
+                  <p className="text-purple-600 font-bold">Зураг оруулах бол энд дарна уу</p>
                 </div>
               )}
             </div>
@@ -210,16 +207,16 @@ export default function StartFundmePage() {
       case 5:
         return (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
-            <h2 className="text-2xl font-bold text-gray-800">Tell your story</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Түүхээ хуваалцана уу</h2>
             <input
               type="text"
-              placeholder="Fundraiser Title"
+              placeholder="Хандивын аяны гарчиг"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full text-xl font-bold p-4 rounded-xl bg-white/50 border-2 border-transparent focus:border-purple-500 outline-none shadow-sm"
             />
             <textarea
-              placeholder="Tell your story..."
+              placeholder="Ямар зорилгоор хандив цуглуулж байгаа тухайгаа бичнэ үү..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full min-h-[150px] p-4 rounded-xl bg-white/50 border-2 border-transparent focus:border-purple-500 outline-none shadow-sm resize-none"
@@ -229,11 +226,11 @@ export default function StartFundmePage() {
       case 6:
         return (
           <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
-            <h2 className="text-2xl font-bold text-gray-800">Review</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Хянах</h2>
             <div className="bg-white/80 p-6 rounded-3xl border-2 border-purple-100 space-y-4">
                <div className="flex justify-between items-center">
-                  <span className="text-xs font-black uppercase text-purple-400">Target Goal</span>
-                  <span className="text-2xl font-black text-purple-600">${formData.goal}</span>
+                  <span className="text-xs font-black uppercase text-purple-400">Зорилтот дүн</span>
+                  <span className="text-2xl font-black text-purple-600">₮{formData.goal}</span>
                </div>
                <div className="border-t pt-4">
                   <h4 className="font-bold text-gray-800">{formData.title}</h4>
@@ -243,7 +240,7 @@ export default function StartFundmePage() {
             </div>
             <div className="flex items-center gap-2 text-blue-600 bg-blue-50 p-3 rounded-xl">
                <CheckCircle2 className="w-4 h-4" />
-               <span className="text-xs font-bold">Ready to be published!</span>
+               <span className="text-xs font-bold">Нийтлэхэд бэлэн боллоо!</span>
             </div>
             {errors.submit && (
               <div className="text-red-500 text-sm bg-red-50 p-3 rounded-xl">
@@ -262,7 +259,6 @@ export default function StartFundmePage() {
       <SignedIn>
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
           
-          {/* Background Decor */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
              <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-200/40 rounded-full blur-[100px] animate-pulse" />
              <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-200/40 rounded-full blur-[100px] animate-pulse" />
@@ -270,34 +266,31 @@ export default function StartFundmePage() {
 
           <div className="max-w-7xl w-full flex flex-col lg:flex-row bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 overflow-hidden relative z-10">
             
-            {/* Left Column - Sidebar Info */}
             <div className="lg:w-1/3 p-8 lg:p-12 bg-gradient-to-b from-purple-600/10 to-transparent border-r border-white/20">
               <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-600 font-semibold hover:gap-3 transition-all mb-12">
-                <ArrowLeft className="w-4 h-4" /> Back
+                <ArrowLeft className="w-4 h-4" /> Буцах
               </button>
               
               <div className="space-y-6">
                 <h1 className="text-4xl font-black text-gray-900 leading-tight">
-                  Start Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Impact</span>
+                  Өөрчлөлтийг <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Эхлүүл</span>
                 </h1>
                 <p className="text-gray-600 text-lg">
-                  Every big change starts with a small step. Tell us about your cause.
+                  Том өөрчлөлт бүхэн жижиг алхмаас эхэлдэг. Түүхээ бидэнд ярьж өгөөрэй.
                 </p>
 
-                {/* Vertical Progress */}
                 <div className="pt-8 space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold shadow-lg">
                       {currentStep}
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-purple-400 uppercase tracking-widest">Current Step</div>
+                      <div className="text-xs font-bold text-purple-400 uppercase tracking-widest">Одоогийн алхам</div>
                       <div className="font-bold text-gray-800 uppercase tracking-tighter">
-                         Step {currentStep} of 6
+                         6-аас {currentStep}-р алхам
                       </div>
                     </div>
                   </div>
-                  {/* Progress Bar */}
                   <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-1000 ease-out"
@@ -308,33 +301,29 @@ export default function StartFundmePage() {
               </div>
             </div>
 
-            {/* Right Column - Form Steps */}
             <div className="lg:w-2/3 p-8 lg:p-16 flex flex-col min-h-[550px]">
               <div className="flex-grow">
-                {/* Header for Step */}
                 <div className="flex justify-between items-center mb-10">
                    <h3 className="text-xl font-bold text-gray-400">0{currentStep} —</h3>
                    {currentStep > 1 && (
                      <button onClick={prevStep} className="text-sm font-bold text-purple-500 hover:underline">
-                       ← Prev Step
+                       ← Өмнөх алхам
                      </button>
                    )}
                 </div>
 
-                {/* Step Content */}
                 <div className="relative">
                    {renderStep()}
                 </div>
               </div>
 
-              {/* Navigation Footer */}
               <div className="mt-12 flex justify-end">
                 {currentStep >= 3 && currentStep < 6 && (
                   <Button 
                     onClick={nextStep}
                     className="bg-gradient-to-r from-purple-600 to-blue-600 hover:shadow-xl hover:shadow-purple-200 rounded-full px-12 py-7 text-lg font-bold transition-all hover:scale-105"
                   >
-                    Continue <ChevronRight className="ml-2 w-5 h-5" />
+                    Үргэлжлүүлэх <ChevronRight className="ml-2 w-5 h-5" />
                   </Button>
                 )}
                 {currentStep === 6 && (
@@ -343,7 +332,7 @@ export default function StartFundmePage() {
                     disabled={isSubmitting}
                     className="bg-green-600 hover:bg-green-700 w-full rounded-full py-7 text-xl font-black shadow-xl disabled:opacity-50"
                    >
-                     {isSubmitting ? "Creating..." : "CREATE FUNDRAISER 🚀"}
+                     {isSubmitting ? "Үүсгэж байна..." : "ХАНДИВ ҮҮСГЭХ 🚀"}
                    </Button>
                 )}
               </div>

@@ -3,27 +3,27 @@ import { Heart, Users, Globe, Shield } from "lucide-react"
 const stats = [
   {
     icon: Heart,
-    value: "$30B+",
-    label: "Total raised",
-    description: "Since we started",
+    value: "100+ Тэрбум", // $30B+ гэдгийг Тэрбум гэж бичвэл илүү сүртэй
+    label: "Нийт цугларсан",
+    description: "Үйл ажиллагаа эхэлснээс хойш",
   },
   {
     icon: Users,
-    value: "150M+",
-    label: "Donors",
-    description: "People giving back",
+    value: "150М+",
+    label: "Хандивлагчид",
+    description: "Сэтгэлээрээ нэгдсэн хүмүүс",
   },
   {
     icon: Globe,
     value: "19",
-    label: "Countries",
-    description: "Global reach",
+    label: "Улс орон",
+    description: "Дэлхий даяарх хамрах хүрээ",
   },
   {
     icon: Shield,
     value: "100%",
-    label: "Secure",
-    description: "Protected donations",
+    label: "Найдвартай",
+    description: "Бүрэн хамгаалагдсан гүйлгээ",
   },
 ]
 
@@ -33,10 +33,10 @@ export function StatsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">
-            Хамгийн найдвартай онлайн хандивын платформ
+            Итгэл дээр тогтсон хандивын платформ
           </h2>
           <p className="text-primary-foreground/80 text-lg max-w-2xl mx-auto">
-            Өдөр бүр өөрсдийн орон нутгийг өөрчилж, сайн сайхныг бүтээж буй сая сая хүмүүст нэгдээрэй
+            Сайн үйлсийн төлөө нэгдсэн сая сая хүмүүстэй хамт эерэг өөрчлөлтийг бүтээгээрэй
           </p>
         </div>
         

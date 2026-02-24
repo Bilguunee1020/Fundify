@@ -209,7 +209,7 @@ export default function DonatePage() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <label className="text-sm font-medium text-foreground">
-                        Add a tip for Fundify
+                        Add a tip for Bayn Tugo
                       </label>
                       <span className="text-sm font-bold text-primary">
                         {tipPercentage}%

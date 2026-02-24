@@ -1,15 +1,15 @@
 import React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, DM_Serif_Display } from "next/font/google";
+import { Inter, Roboto, Montserrat } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { LanguageProvider } from "@/lib/LanguageContext";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
-const _dmSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400" });
+const inter = Inter({ subsets: ["latin", "cyrillic"], display: "swap" });
+const roboto = Roboto({ subsets: ["latin", "cyrillic"], display: "swap", weight: ["400", "500", "700"] });
+const montserrat = Montserrat({ subsets: ["latin", "cyrillic"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "GoFundMe - #1 Crowdfunding Platform",
@@ -41,8 +41,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`font-sans antialiased min-h-screen`}>
+    <html lang="mn">
+      <body className={`antialiased min-h-screen`} style={{
+        fontFamily: inter.style.fontFamily,
+      }}>
         {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && (
           <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
             <LanguageProvider>

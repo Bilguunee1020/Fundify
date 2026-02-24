@@ -93,7 +93,7 @@ export function Header() {
               </div>
             </div>
             <span className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-primary to-slate-900 tracking-tighter">
-              Fundify
+              Bayn Tugo
             </span>
           </Link>
 

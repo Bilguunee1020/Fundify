@@ -6,7 +6,6 @@ import { StatsSection } from "@/components/stats-section";
 import { HowItWorks } from "@/components/how-it-works";
 import { Testimonials } from "@/components/testimonials";
 import { Footer } from "@/components/footer";
-import { Categories } from "@/components/categories";
 
 export default function Home() {
   return (
@@ -16,7 +15,6 @@ export default function Home() {
         <Hero />
         <TrustBar />
         <DiscoverFundraisers />
-        <Categories />
         <StatsSection />
         <HowItWorks />
         <Testimonials />

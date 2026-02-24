@@ -3,25 +3,25 @@ import { Heart, Facebook, Twitter, Instagram, Youtube } from "lucide-react"
 
 const footerLinks = {
   fundraise: [
-    { label: "Start a FundRise", href: "#" },
-    { label: "How it works", href: "#" },
-    { label: "What is crowdfunding?", href: "#" },
-    { label: "Fundraising tips", href: "#" },
-    { label: "Success stories", href: "#" },
+    { label: "Хандив эхлүүлэх", href: "#" },
+    { label: "Хэрхэн ажилладаг вэ?", href: "#" },
+    { label: "Crowdfunding гэж юу вэ?", href: "#" },
+    { label: "Хандив цуглуулах зөвлөмж", href: "#" },
+    { label: "Амжилтын түүхүүд", href: "#" },
   ],
   learn: [
-    { label: "Help center", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Press", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "About us", href: "#" },
+    { label: "Тусламжийн төв", href: "#" },
+    { label: "Блог", href: "#" },
+    { label: "Хэвлэл мэдээлэл", href: "#" },
+    { label: "Ажлын байр", href: "#" },
+    { label: "Бидний тухай", href: "#" },
   ],
   resources: [
-    { label: "Charity fundraising", href: "#" },
-    { label: "Team fundraising", href: "#" },
-    { label: "Pricing", href: "#" },
-    { label: "Supported countries", href: "#" },
-    { label: "Charity sign up", href: "#" },
+    { label: "Буяны хандив", href: "#" },
+    { label: "Багийн хандив", href: "#" },
+    { label: "Үйлчилгээний хураамж", href: "#" },
+    { label: "Дэмжигдсэн улс орнууд", href: "#" },
+    { label: "Байгууллагын бүртгэл", href: "#" },
   ],
 }
 
@@ -39,7 +39,7 @@ export function Footer() {
               <span className="text-xl font-bold">FundRise</span>
             </Link>
             <p className="text-background/70 text-sm mb-4">
-              The trusted leader in online fundraising. Helping people help others since 2026.
+              Онлайн хандив цуглуулах хамгийн найдвартай платформ. 2026 оноос хойш хүмүүст туслахад зуучилж байна.
             </p>
             <div className="flex gap-4">
               <Link href="#" className="text-background/70 hover:text-background transition-colors">
@@ -59,7 +59,7 @@ export function Footer() {
 
           {/* Links */}
           <div>
-            <h3 className="font-semibold mb-4">Fundraise for</h3>
+            <h3 className="font-semibold mb-4">Хандив цуглуулах</h3>
             <ul className="space-y-2">
               {footerLinks.fundraise.map((link, index) => (
                 <li key={index}>
@@ -72,7 +72,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">Learn more</h3>
+            <h3 className="font-semibold mb-4">Илүү ихийг мэдэх</h3>
             <ul className="space-y-2">
               {footerLinks.learn.map((link, index) => (
                 <li key={index}>
@@ -85,7 +85,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">Resources</h3>
+            <h3 className="font-semibold mb-4">Нөөц боломж</h3>
             <ul className="space-y-2">
               {footerLinks.resources.map((link, index) => (
                 <li key={index}>
@@ -101,20 +101,20 @@ export function Footer() {
         <div className="border-t border-background/20 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-background/70">
-              © 2026 FundRise. All rights reserved.
+              © 2026 FundRise. Бүх эрх хуулиар хамгаалагдсан.
             </p>
             <div className="flex gap-6">
               <Link href="#" className="text-sm text-background/70 hover:text-background transition-colors">
-                Terms
+                Үйлчилгээний нөхцөл
               </Link>
               <Link href="#" className="text-sm text-background/70 hover:text-background transition-colors">
-                Privacy
+                Нууцлал
               </Link>
               <Link href="#" className="text-sm text-background/70 hover:text-background transition-colors">
-                Legal
+                Хуулийн заалт
               </Link>
               <Link href="#" className="text-sm text-background/70 hover:text-background transition-colors">
-                Accessibility
+                Хүртээмжтэй байдал
               </Link>
             </div>
           </div>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -39,6 +40,7 @@ function CampaignCard({
           />
           <div className="absolute bottom-3 left-3">
             <span className="bg-foreground/80 text-background text-xs font-medium px-2.5 py-1 rounded capitalize">
+              {/* Энд категорийг монголоор харуулах логик нэмж болно */}
               {fundraiser.category}
             </span>
           </div>
@@ -58,9 +60,9 @@ function CampaignCard({
             </div>
             <p className="text-sm text-muted-foreground mt-2">
               <span className="font-semibold text-foreground">
-                ${fundraiser.raised.toLocaleString()}
+                {fundraiser.raised.toLocaleString()}₮
               </span>{" "}
-              raised of ${fundraiser.goal.toLocaleString()}
+              цугларсан / зорилго: {fundraiser.goal.toLocaleString()}₮
             </p>
           </div>
         </div>
@@ -70,18 +72,19 @@ function CampaignCard({
 }
 
 export function DiscoverFundraisers() {
-  const [filter, setFilter] = useState("Happening worldwide");
+  const [filter, setFilter] = useState("Дэлхий дахинд");
   const [isOpen, setIsOpen] = useState(false);
   const [fundraisers, setFundraisers] = useState<Fundraiser[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Шүүлтүүрүүдийг монгол хэл рүү хөрвүүлэв
   const filters = [
-    "Happening worldwide",
-    "Near me",
-    "United States",
-    "Europe",
-    "Asia",
+    "Дэлхий дахинд",
+    "Миний ойролцоо",
+    "АНУ",
+    "Европ",
+    "Ази",
   ];
 
   useEffect(() => {
@@ -122,7 +125,7 @@ export function DiscoverFundraisers() {
     <section className="py-16 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">
-          Танд сонирхолтой, чухал гэж боддог зүйлсээс урам зориг авсан хандивын аянуудыг нээж олоорой
+          Өөрт ойр, өгөөжтэй аянуудыг нээж олоорой
         </h2>
 
         <div className="flex items-center justify-between mb-8">
@@ -162,20 +165,20 @@ export function DiscoverFundraisers() {
               variant="outline"
               size="icon"
               className="rounded-full w-10 h-10 bg-transparent"
-              disabled={totalPages <= 1}
+              disabled={currentIndex === 0}
             >
               <ArrowLeft className="w-4 h-4" />
-              <span className="sr-only">Previous</span>
+              <span className="sr-only">Өмнөх</span>
             </Button>
             <Button
               onClick={handleNext}
               variant="outline"
               size="icon"
               className="rounded-full w-10 h-10 bg-transparent"
-              disabled={totalPages <= 1}
+              disabled={currentIndex + itemsPerPage >= fundraisers.length}
             >
               <ArrowRight className="w-4 h-4" />
-              <span className="sr-only">Next</span>
+              <span className="sr-only">Дараах</span>
             </Button>
           </div>
         </div>
@@ -184,12 +187,12 @@ export function DiscoverFundraisers() {
         {loading ? (
           <div className="text-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Loading fundraisers...</p>
+            <p className="mt-4 text-muted-foreground">Аянуудыг ачаалж байна...</p>
           </div>
         ) : fundraisers.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-muted-foreground">
-              No fundraisers available yet.
+              Одоогоор хандивын аян байхгүй байна.
             </p>
           </div>
         ) : (
