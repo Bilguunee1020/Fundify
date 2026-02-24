@@ -17,12 +17,12 @@ export async function GET(request: Request) {
 
     let query: any = {};
 
-    // If creator is specified, show all their fundraisers (for my-fundraisers page)
-    // Otherwise, only show active fundraisers (for public listing)
+    // Хэрэв үүсгэгч (creator) тодорхой байвал тухайн хэрэглэгчийн бүх хандивыг харуулна (миний хандив хэсэгт)
+    // Бусад тохиолдолд зөвхөн идэвхтэй хандивуудыг харуулна (нийтэд харагдах жагсаалт)
     if (creator) {
       query.creator = creator;
     } else {
-      query.status = 'active'; // Only show active fundraisers on public pages
+      query.status = 'active'; // Нийтийн хуудас дээр зөвхөн идэвхтэй хандивуудыг харуулна
     }
 
     if (category && category !== 'all') {
@@ -44,8 +44,8 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ fundraisers, total });
   } catch (error) {
-    console.error('Error fetching fundraisers:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Хандивын мэдээлэл авахад алдаа гарлаа:', error);
+    return NextResponse.json({ error: 'Серверийн дотоод алдаа' }, { status: 500 });
   }
 }
 
@@ -56,35 +56,35 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { title, description, goal, category, image, forWhom, creator, userEmail, firstName, lastName } = body;
 
-    // Validate required fields
+    // Шаардлагатай талбаруудыг шалгах
     if (!title || !description || !goal || !category || !forWhom || !creator || !userEmail) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json({ error: 'Шаардлагатай талбаруудыг бөглөнө үү' }, { status: 400 });
     }
 
-    // Validate title length (model requires minlength: 5)
+    // Гарчгийн уртыг шалгах (хамгийн багадаа 5 тэмдэгт)
     if (title.length < 5) {
-      return NextResponse.json({ error: 'Title must be at least 5 characters' }, { status: 400 });
+      return NextResponse.json({ error: 'Гарчиг хамгийн багадаа 5 тэмдэгт байх ёстой' }, { status: 400 });
     }
 
-    // Validate description length (model requires minlength: 20)
+    // Тайлбарын уртыг шалгах (хамгийн багадаа 20 тэмдэгт)
     if (description.length < 20) {
-      return NextResponse.json({ error: 'Description must be at least 20 characters' }, { status: 400 });
+      return NextResponse.json({ error: 'Тайлбар хамгийн багадаа 20 тэмдэгт байх ёстой' }, { status: 400 });
     }
 
-    // Get or create user details
+    // Хэрэглэгчийн мэдээллийг авах эсвэл шинээр үүсгэх
     let user = await User.findOne({ clerkId: creator });
     if (!user) {
-      // User doesn't exist, create them
+      // Хэрэглэгч бүртгэлгүй бол шинээр үүсгэнэ
       user = new User({
         clerkId: creator,
         email: userEmail,
-        firstName: firstName || 'Unknown',
-        lastName: lastName || 'User',
+        firstName: firstName || 'Үл мэдэгдэх',
+        lastName: lastName || 'Хэрэглэгч',
       });
       await user.save();
     }
 
-    // Create new fundraiser with pending status
+    // Хандивыг "хүлээгдэж буй" (pending) төлөвтэйгээр үүсгэх
     const fundraiser = new Fundraiser({
       title,
       description,
@@ -98,31 +98,31 @@ export async function POST(request: Request) {
 
     await fundraiser.save();
 
-    // Create approval request
+    // Зөвшөөрөл хүсэх хүсэлт (approval request) үүсгэх
     const approvalRequest = new ApprovalRequest({
       type: 'fundraiser',
       userId: creator,
       userEmail: userEmail,
       fundraiserId: fundraiser._id.toString(),
-      reason: `New fundraiser: ${title}`,
+      reason: `Шинэ хандив: ${title}`,
     });
 
     await approvalRequest.save();
 
     return NextResponse.json({ 
-      message: 'Fundraiser submitted for approval', 
+      message: 'Хандивын хүсэлтийг хянахаар хүлээн авлаа', 
       fundraiser,
       approvalRequest 
     }, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating fundraiser:', error);
+    console.error('Хандив үүсгэхэд алдаа гарлаа:', error);
     
-    // Handle Mongoose validation errors
+    // Mongoose-ийн баталгаажуулалтын алдааг боловсруулах
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map((err: any) => err.message);
-      return NextResponse.json({ error: validationErrors[0] || 'Validation error', details: validationErrors }, { status: 400 });
+      return NextResponse.json({ error: validationErrors[0] || 'Баталгаажуулалтын алдаа', details: validationErrors }, { status: 400 });
     }
     
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Серверийн дотоод алдаа' }, { status: 500 });
   }
 }

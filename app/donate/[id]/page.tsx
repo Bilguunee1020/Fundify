@@ -326,7 +326,7 @@ export default function DonatePage() {
                       />
                     </div>
                     <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>Goal: ${fundraiser.goal.toLocaleString()}</span>
+                      <span>Goal: ₮{fundraiser.goal.toLocaleString()}</span>
                       <span>
                         {Math.round(
                           (fundraiser.raised / fundraiser.goal) * 100,

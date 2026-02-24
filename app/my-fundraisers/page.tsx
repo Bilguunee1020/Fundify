@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/nextjs";
-import { Edit, Eye, ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Search, Heart, TrendingUp } from "lucide-react";
+import { Header } from "@/components/header";
 
 interface Fundraiser {
   _id: string;
@@ -16,25 +15,21 @@ interface Fundraiser {
   raised: number;
   category: string;
   image: string;
-  status: string;
   createdAt: string;
 }
 
-export default function MyFundraisersPage() {
-  const { user } = useUser();
-  const router = useRouter();
+export default function FundraisersPage() {
   const [fundraisers, setFundraisers] = useState<Fundraiser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    if (user) {
-      fetchFundraisers();
-    }
-  }, [user]);
+    fetchFundraisers();
+  }, []);
 
   const fetchFundraisers = async () => {
     try {
-      const response = await fetch(`/api/fundraisers?creator=${user?.id}`);
+      const response = await fetch("/api/fundraisers");
       const data = await response.json();
       setFundraisers(data.fundraisers || []);
     } catch (error) {
@@ -44,116 +39,133 @@ export default function MyFundraisersPage() {
     }
   };
 
+  const filteredFundraisers = fundraisers.filter(
+    (fundraiser) =>
+      fundraiser.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fundraiser.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fundraiser.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-      <SignedIn>
-        <div className="min-h-screen bg-background py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Back
-            </button>
-            {loading ? (
-              <div className="text-center py-16">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="mt-4 text-muted-foreground">
-                  Loading your fundraisers...
-                </p>
-              </div>
-            ) : fundraisers.length === 0 ? (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground mb-6">
-                  You haven't created any fundraisers yet.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {fundraisers.map((fundraiser) => (
-                  <div
-                    key={fundraiser._id}
-                    className="bg-card rounded-xl shadow-sm overflow-hidden border hover:border-primary/20"
-                  >
-                    <div className="aspect-video bg-muted relative">
-                      {fundraiser.image ? (
-                        <img
-                          src={fundraiser.image}
-                          alt={fundraiser.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                          No image
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-xl font-semibold text-foreground line-clamp-2">
-                          {fundraiser.title}
-                        </h3>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            fundraiser.status === "active"
-                              ? "bg-green-100 text-green-800"
-                              : fundraiser.status === "completed"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {fundraiser.status}
-                        </span>
-                      </div>
-                      <p className="text-muted-foreground text-sm mb-6 line-clamp-3">
-                        {fundraiser.description}
-                      </p>
-                      <div className="flex justify-between items-center mb-6">
-                        <div>
-                          <p className="text-sm text-muted-foreground">
-                            Raised
-                          </p>
-                          <p className="text-2xl font-bold text-primary">
-                            ${fundraiser.raised.toLocaleString()} / $
-                            {fundraiser.goal.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">
-                            Category
-                          </p>
-                          <p className="text-sm font-medium capitalize text-foreground">
-                            {fundraiser.category}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" className="flex-1">
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit
-                        </Button>
-                        <Link
-                          href={`/fundraisers/${fundraiser._id}`}
-                          className="flex-1"
-                        >
-                          <Button className="w-full">
-                            <Eye className="w-4 h-4 mr-2" />
-                            View Details
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
+      <Header />
+
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-green-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
+              Бүх хандив тусламжийн аянууд
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Сайн үйлсийн төлөөх зорилтуудтай танилцаж, дэлхий ертөнцийг илүү сайн сайхан болгоход хувь нэмрээ оруулаарай.
+            </p>
+          </div>
+
+          {/* Search */}
+          <div className="max-w-md mx-auto relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 w-5 h-5" />
+            <Input
+              type="text"
+              placeholder="Аян хайх..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-3 rounded-full border-2 border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300"
+            />
           </div>
         </div>
-      </SignedIn>
-    </>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Хандивын аянуудыг ачаалж байна...</p>
+          </div>
+        ) : filteredFundraisers.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 mb-4">Одоогоор хандивын аян байхгүй байна</p>
+            <Link href="/donate">
+              <Button className="bg-green-600 hover:bg-green-700">
+                Өөрийн хандивын аяныг эхлүүлэх
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredFundraisers.map((fundraiser) => {
+              const progress = Math.min(
+                (fundraiser.raised / fundraiser.goal) * 100,
+                100
+              );
+
+              return (
+                <Link
+                  key={fundraiser._id}
+                  href={`/fundraisers/${fundraiser._id}`}
+                  className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-500 transform hover:-translate-y-2 block border border-gray-100"
+                >
+                  <div className="aspect-video bg-gray-100 relative overflow-hidden">
+                    <img
+                      src={fundraiser.image || "/placeholder.svg"}
+                      alt={fundraiser.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Heart className="w-4 h-4 text-red-500" />
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-xl font-bold text-gray-900 line-clamp-2 flex-1 group-hover:text-green-600 transition-colors">
+                        {fundraiser.title}
+                      </h3>
+                      <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full ml-2 capitalize font-medium">
+                        {fundraiser.category}
+                      </span>
+                    </div>
+
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                      {fundraiser.description}
+                    </p>
+
+                    <div className="mb-5">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="font-medium text-gray-600">Цугларсан</span>
+                        <span className="font-bold text-green-600">
+                          {fundraiser.raised.toLocaleString()}₮ /{" "}
+                          {fundraiser.goal.toLocaleString()}₮
+                        </span>
+                      </div>
+
+                      <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden border border-gray-50">
+                        <div
+                          className="bg-gradient-to-r from-green-400 via-green-500 to-emerald-600 h-3 rounded-full transition-all duration-1000"
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+
+                      <div className="flex justify-between text-xs text-green-600 mt-2 font-medium">
+                        <span>{Math.round(progress)}% биелсэн</span>
+                        <span className="flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" />
+                          Active
+                        </span>
+                      </div>
+                    </div>
+
+                    <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 rounded-xl shadow-md hover:shadow-green-200 transition-all duration-300">
+                      Хандив өгөх
+                    </Button>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

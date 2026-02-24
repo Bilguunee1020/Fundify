@@ -77,10 +77,10 @@ export default function FundraisersPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
-              All Fundraisers
+              Бүх хандив тусламжийн аянууд
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover amazing causes and help make a difference in the world
+              Сайн үйлсийн төлөөх зорилтуудтай танилцаж, дэлхий ертөнцийг илүү сайн сайхан болгоход хувь нэмрээ оруулаарай.
             </p>
           </div>
           
@@ -102,13 +102,13 @@ export default function FundraisersPage() {
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading fundraisers...</p>
+            <p className="mt-4 text-gray-600">Хандивын аянуудыг ачаалж байна...</p>
           </div>
         ) : filteredFundraisers.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 mb-4">No fundraisers available.</p>
+            <p className="text-gray-600 mb-4">Одоогоор хандивын аян байхгүй байна</p>
             <Link href="/donate">
-              <Button className="bg-green-600 hover:bg-green-700">Start Your Own Fundraiser</Button>
+              <Button className="bg-green-600 hover:bg-green-700">Өөрийн хандивын аяныг эхлүүлэх</Button>
             </Link>
           </div>
         ) : (
