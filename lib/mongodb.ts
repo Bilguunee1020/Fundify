@@ -1,20 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  console.warn("MONGODB_URI not defined - MongoDB connection will fail");
-}
+// ✅ Debug log (Vercel дээр харагдана)
+console.log("🚀 MONGODB_URI EXISTS:", !!MONGODB_URI);
+console.log("🚀 MONGO URI LENGTH:", MONGODB_URI?.length);
+console.log(
+  "🚀 MONGO URI START:",
+  MONGODB_URI ? MONGODB_URI.substring(0, 20) : "NO_URI"
+);
 
 /**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
+ * Global cache to prevent multiple DB connections
  */
 let cached = (global as any).mongoose;
 
 if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+  cached = (global as any).mongoose = {
+    conn: null,
+    promise: null,
+  };
 }
 
 async function connectToDatabase() {
@@ -23,24 +28,21 @@ async function connectToDatabase() {
   }
 
   if (!MONGODB_URI) {
-    throw new Error('MONGODB_URI environment variable is not defined');
+    throw new Error("❌ MONGODB_URI is not defined in environment variables");
   }
 
   if (!cached.promise) {
-    const opts = {
+    cached.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
     });
   }
 
   try {
     cached.conn = await cached.promise;
-  } catch (e) {
+  } catch (error) {
     cached.promise = null;
-    throw e;
+    console.error("❌ MongoDB Connection Error:", error);
+    throw error;
   }
 
   return cached.conn;
