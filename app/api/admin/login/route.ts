@@ -3,9 +3,11 @@ import Admin from '@/lib/models/Admin';
 import connectToDatabase from '@/lib/mongodb';
 
 export async function POST(request: NextRequest) {
+  console.log("LOGIN HIT");
+
   try {
     await connectToDatabase();
-    
+
     const { email, adminCode } = await request.json();
 
     if (!email || !adminCode) {
@@ -15,10 +17,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const admin = await Admin.findOne({ 
-      email, 
-      adminCode, 
-      isActive: true 
+    const admin = await Admin.findOne({
+      email,
+      adminCode,
+      isActive: true
     });
 
     if (!admin) {
@@ -40,6 +42,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Admin login error:', error);
+
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }
