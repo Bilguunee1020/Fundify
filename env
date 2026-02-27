@@ -1,0 +1,7 @@
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_c2luY2VyZS1lZnQtODUuY2xlcmsuYWNjb3VudHMuZGV2JA
+CLERK_SECRET_KEY=sk_test_Y4mGZheYGop6Tkx9rmXwRfzvf1erSgKojlhVJ5VEoj
+MONGODB_URI=mongodb+srv://fundify_user:Bilguun0852@fundify.7bey1sh.mongodb.net/?appName=fundify
+BLOB_READ_WRITE_TOKEN="vercel_blob_rw_xh4magpOSDBbAcY3_thzcZu1t4QiRcC364E6KugOb8Y4s4d"
+
+ADMIN_EMAIL=ochirkhuubilguun0852@gmail.com
+ADMIN_PASSWORD=qwerty1234
